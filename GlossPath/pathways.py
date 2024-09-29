@@ -2,6 +2,8 @@
 ## im gonna supply the pathways myself, but will give the options to refresh kegg
 import pickle
 
+import importlib
+
 class PathwaysModule():
     def __init__(self, pathway_string):
         pass
