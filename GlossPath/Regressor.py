@@ -1,5 +1,5 @@
 # designed to be done over a single cell type, using normalized data
-
+from sklearn.base import BaseEstimator, RegressorMixin
 from skglm import GroupLasso
 import pandas as pd 
 import numpy as np
@@ -14,7 +14,7 @@ import PathwaysModule
 # I guess then this regressor can be initialized based off of just feeding in the pathway string, right?
 # not quite - I need to feed in a geneset that defines the 'scope' of the thing
 
-class Regressor():
+class Regressor(BaseEstimator, RegressorMixin):
     # separate pathway database 
     def __init__(self, gene_list, pathway_string, group_reg=0.005, l1_reg=3, only_pathways=False):
         self.group_reg = group_reg 
@@ -30,6 +30,10 @@ class Regressor():
 
     def fit(self, X, y):
         self.reg.fit(X, y)
+        return self
+
+    def predict(self, X):
+        return self.reg.predict(X)
         
     def _prep_pathways(self):
         return PathwaysModule(self.pathway_string, self.gene_list)
