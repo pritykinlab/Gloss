@@ -17,11 +17,11 @@ import PathwaysModule
 class Regressor(BaseEstimator, RegressorMixin):
     # separate pathway database 
     def __init__(self, gene_list, pathway_string, group_reg=0.005, l1_reg=3, only_pathways=False):
+        super().__init__()
         self.group_reg = group_reg 
         self.l1_reg = l1_reg
         self.gene_list = gene_list
         self.only_pathways = only_pathways
-        self.norm = 'log_lib_norm'
         self.pathway_string = pathway_string
         self.pathways = self._prep_pathways().pathways
         self.pathway_genes = set([ x for mylist in self.pathways.values() for x in mylist ])
