@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import scanpy as sc
 
-import PathwaysModule
+from .pathwaysmodule import PathwaysModule
 
 # should there be a function that automatically does the CV loop? Probably, right?
 # so this class will just load and run the regression for a given data slice, over a specific subtype.

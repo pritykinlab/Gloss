@@ -5,7 +5,7 @@ import anndata as ad
 import numpy as np
 import pandas as pd
 
-import PathwaysModule
+from .pathwaysmodule import PathwaysModule
 
 class PrepData():
     def __init__(self, adata, pathway_string, donors_profiled = False):
