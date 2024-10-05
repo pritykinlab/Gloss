@@ -8,12 +8,19 @@ import pandas as pd
 from .pathwaysmodule import PathwaysModule
 
 class PrepData():
-    def __init__(self, adata, pathway_string, donors_profiled = False):
+    def __init__(self, adata, pathway_string, 
+                 sample_hashtag = 'hash_max', libsize = 'n_counts',
+                 interaction = 'biotin',
+                 donors_profiled = False, only_pathways=False):
         ## we need to have raw counts in the anndata.X, 
         ## and we need to have 'biotin_raw' as a field
         ## and we need to have 'sample hashtag' out
         self.norm = 'log_scaled'
         self.donors_profiled = donors_profiled
+        self.only_pathways = only_pathways
+        self.sample_hashtag = sample_hashtag
+        self.libsize = libsize 
+        self.interaction = interaction
 
         if type(adata) == str:
             self.adata = sc.read_h5ad(adata)
@@ -25,7 +32,9 @@ class PrepData():
         self._prep_biotin()
 
         self.pathway_string = pathway_string
-        self.pathways = self._prep_pathways()
+        self.pathways_mod = self._prep_pathways()
+
+        self.genes = list(self.adata.var.index)
 
         self.X = self._prep_X()
         self.y = self._prep_y()
@@ -40,29 +49,16 @@ class PrepData():
         return PathwaysModule(self.pathway_string, list(self.adata.var.index))
 
     def _prep_confounders(self):
-
-        ## assume hashtag is in a specific field
-        hto_path = '/Genomics/pritykinlab/sarah/lipstic_analysis/ulipstic-analysis/gut.extra_sample_HTO_count_info.csv'
-        hto_info = pd.read_csv(hto_path, index_col=0)
-
-        self.adata.obs['avg_sample_hto'] = hto_info['sample_counts_avgd']
-
         # new confounder variables
-        rna_logcounts = np.log10(self.adata.obs['total_counts'] + np.percentile(self.adata.obs['total_counts'], 0.1))
-        hash_logcounts = np.log10(self.adata.obs['avg_sample_hto'] + np.percentile(self.adata.obs['avg_sample_hto'], 0.1))
+        self.adata.obs['log_RNA_libsize'] = self._normalize_confounder(self.libsize)
+        self.adata.obs['log_sample_hashtag'] = self._normalize_confounder(self.sample_hashtag)
 
-        mean = np.mean(rna_logcounts)
-        std_dev = np.std(rna_logcounts)
+    def _normalize_confounder(self, confounder_str):
+        confounder = np.log10(self.adata.obs[confounder_str] + np.percentile(self.adata.obs[confounder_str], 0.1))
+        mean = np.mean(confounder)
+        std_dev = np.std(confounder)
         # Standardize the array
-        rna_logcounts = (rna_logcounts - mean) / std_dev
-
-        mean = np.mean(hash_logcounts)
-        std_dev = np.std(hash_logcounts)
-        # Standardize the array
-        hash_logcounts = (hash_logcounts - mean) / std_dev
-
-        self.adata.obs['log_sample_hashtag'] = hash_logcounts
-        self.adata.obs['log_RNA_libsize'] = rna_logcounts
+        return (confounder - mean) / std_dev
 
     def _prep_biotin(self):
         new_biotin = np.log10(self.adata.obs['raw_biotin'] + np.percentile(self.adata.obs['raw_biotin'], 5))
@@ -74,7 +70,7 @@ class PrepData():
 
     def _normalize_adata(self):
         self.adata.layers['raw_counts'] = self.adata.X.copy()
-        sc.pp.filter_genes(self.adata.X, min_counts=1)
+        sc.pp.filter_genes(self.adata, min_counts=1)
         sc.pp.normalize_total(self.adata, target_sum = 10000)
         sc.pp.log1p(self.adata)
         self.adata.layers["log_lib_norm"] = self.adata.X.copy()
@@ -88,13 +84,13 @@ class PrepData():
         ad_df = self.adata.to_df()
         new_df = pd.DataFrame({}, index= ad_df.index)
         mydf_list = []
-        for pathway in enumerate(self.pathways):
-            mydf = ad_df.loc[:, self.pathways[pathway]]
+        for pathway in self.pathways_mod.pathways:
+            mydf = ad_df.loc[:, self.pathways_mod.pathways[pathway]]
             mydf.columns = mydf.columns + '_' + pathway
             mydf_list.append(mydf)
         
         if not self.only_pathways:
-            nogroup_df = ad_df[[col for col in ad_df.columns if col not in self.pathway_genes]]
+            nogroup_df = ad_df[[col for col in ad_df.columns if col not in self.pathways_mod.pathway_genes]]
             nogroup_df.columns = nogroup_df.columns + '_no_pathway'
             mydf_list.append(nogroup_df)
         

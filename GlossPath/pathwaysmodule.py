@@ -12,11 +12,13 @@ class PathwaysModule():
         if pathway_string not in self.accepted_pathways:
             raise ValueError('pathways string not in {}'.format(", ".join(self.accepted_pathways)))
         elif pathway_string == 'hallmark':
-            self.pathways = self.get_hallmark_pathways()
+            self.pathways = self._get_hallmark_pathways()
         elif pathway_string == 'kegg':
-            self.pathways = self.get_kegg_pathways()
+            self.pathways = self._get_kegg_pathways()
 
-    def get_hallmark_pathways(self):
+        self.pathway_genes = self._get_pathway_genes()
+
+    def _get_hallmark_pathways(self):
         pathways = {}
         hallmark_pathways_path = './data/mouse_hallmark_genes.gmt.txt'
         data_file_path = os.path.join(self.package_dir, hallmark_pathways_path)
@@ -28,9 +30,9 @@ class PathwaysModule():
                 pathway = list(set(pathway).intersection(self.adata_genes))
                 pathways[words[0]] = pathway
 
-        return self.non_empty_pathways(pathways)
+        return self._non_empty_pathways(pathways)
 
-    def get_kegg_pathways(self):
+    def _get_kegg_pathways(self):
         kegg_pathways_path = './data/kegg_pathways_sep18_2024.pkl'
         data_file_path = os.path.join(self.package_dir, kegg_pathways_path)
         with open(data_file_path, 'rb') as handle:
@@ -38,9 +40,9 @@ class PathwaysModule():
         for key, value in kegg_gene_sets.items():
             kegg_gene_sets[key] = list(set([gene for gene in value if gene in self.adata_genes]))
             
-        return self.non_empty_pathways(kegg_gene_sets)
+        return self._non_empty_pathways(kegg_gene_sets)
     
-    def non_empty_pathways(self, pathway_gene_sets):
+    def _non_empty_pathways(self, pathway_gene_sets):
         empty = []
         for key in pathway_gene_sets:
             if not pathway_gene_sets[key]:
@@ -49,3 +51,6 @@ class PathwaysModule():
             pathway_gene_sets.pop(pathway)
             
         return pathway_gene_sets
+    
+    def _get_pathway_genes(self):
+        return set([ x for mylist in self.pathways.values() for x in mylist ])
