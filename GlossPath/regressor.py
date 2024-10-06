@@ -7,19 +7,12 @@ import scanpy as sc
 
 from .pathwaysmodule import PathwaysModule
 
-# should there be a function that automatically does the CV loop? Probably, right?
-# so this class will just load and run the regression for a given data slice, over a specific subtype.
-
-# the weights are dependent on the l1_penalty fed in
-# I guess then this regressor can be initialized based off of just feeding in the pathway string, right?
-# not quite - I need to feed in a geneset that defines the 'scope' of the thing
-
 class Regressor(BaseEstimator, RegressorMixin):
     # separate pathway database 
-    def __init__(self, gene_list, pathway_string, group_reg=0.005, l1_reg=3, only_pathways=False):
+    def __init__(self, gene_list, pathway_string, group_reg=0.005, single_gene_reg=3, only_pathways=False):
         super().__init__()
         self.group_reg = group_reg 
-        self.l1_reg = l1_reg
+        self.single_gene_reg = single_gene_reg
         self.gene_list = gene_list
         self.only_pathways = only_pathways
         self.pathway_string = pathway_string
@@ -30,6 +23,8 @@ class Regressor(BaseEstimator, RegressorMixin):
 
     def fit(self, X, y):
         self.reg.fit(X, y)
+        self.coef_ = self.reg.coef_
+        self.intercept_ = self.reg.intercept_
         return self
 
     def predict(self, X):
@@ -59,7 +54,7 @@ class Regressor(BaseEstimator, RegressorMixin):
                 i += 1
                 k += 1
             for _ in range(k):
-                weights.append(self.l1_reg)
+                weights.append(self.single_gene_reg)
         
         # accounting for the two confounders
         for _ in range(2):
