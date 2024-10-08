@@ -24,6 +24,7 @@ class RegressBootstrap():
     
         self.response = self._bootstrap()
         self.response_individual_genes = self._bootstrap_res_individual_genes()
+        self.pathway_frequencies = self._get_pathway_frequencies()
 
     def _bootstrap(self):
         bootstrap_response = {}
@@ -86,3 +87,26 @@ class RegressBootstrap():
                 ind_genes_response[res][ctype] = summed_df.copy()
             
         return ind_genes_response
+    
+    def _get_pathway_frequencies(self):
+        pathway_frequencies = {}
+        for res in self.resolutions:
+            pathway_frequencies[res] = {}
+            for ctype in self.resolutions[res]:
+                included_counts = {}
+                mydf = self.response[res][ctype].copy()
+                mydf = mydf.loc[:, ~mydf.columns.str.contains('_no_pathway')]
+                for i in range(self.n_bootstraps):
+                    test_boot_coefs = mydf.iloc[i]
+                    myarray = test_boot_coefs[test_boot_coefs != 0]
+                    myset = set([ pathway_names.split("_", 1)[1] for pathway_names in myarray.index  ])
+                    for item in myset:
+                        included_counts[item] = included_counts.get(item, 0) + 1
+                my_dict = included_counts.copy()
+                my_dict.pop('RNA_libsize')
+                my_dict.pop('sample_hashtag')
+                sorted_dict = sorted(my_dict.items(), key=lambda item: item[1], reverse=True)
+                pathway_frequencies[res][ctype] = sorted_dict
+
+        return pathway_frequencies
+
