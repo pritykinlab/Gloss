@@ -103,8 +103,8 @@ class RegressBootstrap():
                     for item in myset:
                         included_counts[item] = included_counts.get(item, 0) + 1
                 my_dict = included_counts.copy()
-                my_dict.pop('RNA_libsize')
-                my_dict.pop('sample_hashtag')
+                my_dict.pop('RNA_libsize', 0)
+                my_dict.pop('sample_hashtag', 0)
                 sorted_dict = sorted(my_dict.items(), key=lambda item: item[1], reverse=True)
                 pathway_frequencies[res][ctype] = sorted_dict
 

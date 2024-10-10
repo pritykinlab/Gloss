@@ -15,7 +15,7 @@ class RegressCV():
     def __init__(self, adata, resolutions, pathway_string,
                  sample_hashtag = 'hash_max', libsize = 'n_counts',
                  interaction = 'biotin',
-                 group_regs = [0.004, 0.005, 0.006, 0.007], single_gene_regs = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5], 
+                 group_regs = [0.004, 0.005, 0.006, 0.007, 0.008], single_gene_regs = [1, 2, 3, 4, 5], 
                  donors_profiled=False):
         self.pathway_string = pathway_string
         self.prepped_data = PrepData(adata, self.pathway_string, 
@@ -83,7 +83,7 @@ class RegressCV():
                     'single_gene_reg' : self.single_gene_regs
                 }
                 score_dict = self._scoring()
-                grid_search = GridSearchCV(myreg, param_grid, cv=inner_cv, n_jobs=-1)
+                grid_search = GridSearchCV(myreg, param_grid, cv=inner_cv, n_jobs=-1, scoring='neg_mean_squared_error')
                 response[res][ctype] = cross_validate(grid_search, X, y, cv=outer_cv, n_jobs=-1, 
                                                            return_train_score=True, return_estimator=True,
                                                            scoring=score_dict)

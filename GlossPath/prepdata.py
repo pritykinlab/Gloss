@@ -61,10 +61,10 @@ class PrepData():
         return (confounder - mean) / std_dev
 
     def _prep_biotin(self):
-        new_biotin = np.log10(self.adata.obs['raw_biotin'] + np.percentile(self.adata.obs['raw_biotin'], 5))
+        new_biotin = np.log10(self.adata.obs[self.interaction] + np.percentile(self.adata.obs[self.interaction], 5))
         self.adata.obs['new_biotin'] = new_biotin - min(new_biotin)
 
-        new_biotin_temp = self.adata.obs['raw_biotin'] / self.adata.obs['avg_sample_hto']
+        new_biotin_temp = self.adata.obs[self.interaction] / self.adata.obs[self.sample_hashtag]
         new_biotin = np.log10(new_biotin_temp + np.percentile(new_biotin_temp, 5))
         self.adata.obs['other_new_biotin'] = new_biotin - min(new_biotin)
 

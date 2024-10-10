@@ -22,6 +22,7 @@ class Regressor(BaseEstimator, RegressorMixin):
         self.reg = GroupLasso(self.p_w[0], self.group_reg, self.p_w[1])
 
     def fit(self, X, y):
+        self._initialize_model()
         self.reg.fit(X, y)
         self.coef_ = self.reg.coef_
         self.intercept_ = self.reg.intercept_
@@ -29,6 +30,24 @@ class Regressor(BaseEstimator, RegressorMixin):
 
     def predict(self, X):
         return self.reg.predict(X)
+    
+    def get_params(self, deep=True):
+        # Return parameters in a dictionary format
+        return {'gene_list' : self.gene_list,
+                'pathway_string' : self.pathway_string,
+                'group_reg': self.group_reg, 
+                'single_gene_reg': self.single_gene_reg}
+
+    def set_params(self, **params):
+        if 'gene_list' in params:
+            self.gene_list = params['gene_list']
+        if 'pathway_string' in params:
+            self.pathway_string = params['pathway_string']
+        if 'group_reg' in params:
+            self.group_reg = params['group_reg']
+        if 'single_gene_reg' in params:
+            self.single_gene_reg = params['single_gene_reg']
+        return self
         
     def _prep_pathways(self):
         return PathwaysModule(self.pathway_string, self.gene_list)
@@ -65,3 +84,7 @@ class Regressor(BaseEstimator, RegressorMixin):
         weights = np.array(weights)
         
         return partitions, weights
+
+    def _initialize_model(self):
+        self.p_w = self._get_partitions_and_weights()
+        self.reg = GroupLasso(self.p_w[0], self.group_reg, self.p_w[1])  
