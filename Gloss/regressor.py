@@ -53,7 +53,8 @@ class Regressor(BaseEstimator, RegressorMixin):
         return PathwaysModule(self.pathway_string, self.gene_list)
 
     def _get_partitions_and_weights(self):
-        nogroup_cols = [ gene for gene in self.gene_list if gene not in self.pathway_genes ]
+        # nogroup_cols = [ gene for gene in self.gene_list if gene not in self.pathway_genes ]
+        nogroup_cols = [ gene for gene in self.gene_list ]
         partitions = []
         weights = []
         i = 0

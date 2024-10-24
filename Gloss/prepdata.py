@@ -90,7 +90,8 @@ class PrepData():
             mydf_list.append(mydf)
         
         if not self.only_pathways:
-            nogroup_df = ad_df[[col for col in ad_df.columns if col not in self.pathways_mod.pathway_genes]]
+            #nogroup_df = ad_df[[col for col in ad_df.columns if col not in self.pathways_mod.pathway_genes]]
+            nogroup_df = ad_df.copy()
             nogroup_df.columns = nogroup_df.columns + '_no_pathway'
             mydf_list.append(nogroup_df)
         
