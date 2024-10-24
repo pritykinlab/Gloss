@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools", "wheel"]  # Dependencies needed to build the project
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Gloss"  # The name of your project
+version = "0.1.0"  # Version number
+description = "Package for regressing LIPSTIC signal on scRNA-seq data using overlapping group lasso"
+readme = "README.md"  # Path to your readme file
+authors = [
+    {name = "Pritykin Lab", email = "pritykin@princeton.edu"},
+]
+license = {text = "MIT"}  # You can specify your license type here
+keywords = ["LIPSTIC", "scRNA-seq", "Group Lasso"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+
+dependencies = [
+    "numpy>=1.21.0",
+    "pandas>=1.3.0",
+    "scanpy>=1.9.1",
+    "scikit-learn>=1.2.1",
+    "skglm @ git+https://github.com/scikit-learn-contrib/skglm.git"
+]
+
+[project.urls]
+homepage = "https://github.com/pritykinlab/Gloss"
+repository = "https://github.com/pritykinlab/Gloss"
+documentation = "https://github.com/pritykinlab/Gloss"
