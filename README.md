@@ -1,7 +1,15 @@
 # Gloss
 
+Gloss is a computational method that regresses LIPSTIC data on scRNA-seq features in paired LIPSTIC+scRNA-seq experiments. It accomplishes this by using an overlapping group lasso procedure using a set of pathways (which are preloaded into Gloss).
+
+## Installation
+
+To install Gloss, simply run `pip install .` in this cloned repository in your environment.
+
+## Running Gloss
+
 Gloss assumes your data is annotated already, which you can specify under the `resolutions` field of the regression.
-An example script of tuning Gloss using the hallmark pathways on your data is shown below:
+An example script of tuning Gloss using the Hallmark pathways on your data is shown below:
 
 ```{python}
 datapath = 'myscrna_anndata.h5ad' # with raw values in anndata.X
