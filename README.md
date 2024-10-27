@@ -2,6 +2,8 @@
 
 Gloss is a computational method that regresses LIPSTIC data on scRNA-seq features in paired LIPSTIC+scRNA-seq experiments. It accomplishes this by using an overlapping group lasso procedure using a set of pathways (which are preloaded into Gloss).
 
+![Gloss Diagram](Gloss_Figure1.png)
+
 ## Installation
 
 To install Gloss, simply run `pip install .` in this cloned repository in your environment.
