@@ -21,7 +21,12 @@ resolutions = {
 
 from Gloss.regresscv import RegressCV
 
-regcv = RegressCV(datapath, resolutions, 'hallmark', 'raw sample hashtag library size', 'RNA library size', 'uLIPSTIC raw signal')
+regcv = RegressCV(datapath,
+                  resolutions,
+                  'hallmark',
+                  'raw sample hashtag library size',
+                  'RNA library size',
+                  'uLIPSTIC raw signal')
 ```
 
 Then, with the tuned parameters, you can run bootstrapped regression with Gloss to get robust estimates of the interaction-associated coefficients and pathways.
@@ -30,8 +35,14 @@ To do this, here is an example script:
 ```{python}
 from Gloss.regressbootstrap import RegressBootstrap
 
-regb = RegressBootstrap(datapath, resolutions, 'hallmark', myregcv.best_params, 100,
-                  'raw sample hashtag library size', 'RNA library size', 'uLIPSTIC raw signal')
+regb = RegressBootstrap(datapath,
+                        resolutions,
+                        'hallmark',
+                        myregcv.best_params,
+                        100,
+                        'raw sample hashtag library size',
+                        'RNA library size',
+                        'uLIPSTIC raw signal')
 
 savepath = 'some bootstrap savepath'
 
