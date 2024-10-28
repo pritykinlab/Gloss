@@ -53,3 +53,4 @@ with open(savepath, 'wb') as handle:
     pickle.dump(regb, handle, protocol=4)
 ```
 
+Both of the above functions internally call the `PrepData` to preprocess the data and `Regressor` functions from Gloss to run the actual regression itself.
