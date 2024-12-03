@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from .pathwaysmodule import PathwaysModule
+from .normalizelipstic import NormalizeLipsticRegressor
 
 class PrepData():
     def __init__(self, adata, pathway_string, 
@@ -38,6 +39,8 @@ class PrepData():
 
         self.X = self._prep_X()
         self.y = self._prep_y()
+
+        self._normalize_biotin()
 
     def subset(self, resolution, celltype):
         index = self.adata.obs[resolution].isin([celltype])
@@ -105,3 +108,21 @@ class PrepData():
         
     def _prep_y(self):
         return self.adata.obs['new_biotin']
+    
+    def _normalize_biotin(self):
+        rna_logcounts = self.adata.obs['log_RNA_libsize']
+        hash_logcounts = self.adata.obs['log_sample_hashtag']
+
+        features_matrix = np.concatenate((
+                                        rna_logcounts.to_numpy().reshape(-1,1),
+                                        hash_logcounts.to_numpy().reshape(-1,1),
+                                        ), axis=1)
+        y = self.y
+        
+        norm_reg = NormalizeLipsticRegressor().normalize_fit(features_matrix, y)
+
+        my_libsize = self.adata.obs['log_RNA_libsize']
+        my_sample_hashtag = self.adata.obs['log_sample_hashtag']
+        my_biotin = self.adata.obs['new_biotin']
+
+        self.adata.obs['gloss_normalized_biotin'] = my_biotin - (norm_reg.coef_[-2] * my_libsize + norm_reg.coef_[-1] * my_sample_hashtag)
