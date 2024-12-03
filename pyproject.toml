@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "Gloss"  # The name of your project
-version = "0.1.0"  # Version number
+version = "0.2.0"  # Version number
 description = "Package for regressing LIPSTIC signal on scRNA-seq data using overlapping group lasso"
 readme = "README.md"  # Path to your readme file
 authors = [
