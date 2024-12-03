@@ -54,3 +54,24 @@ with open(savepath, 'wb') as handle:
 ```
 
 Both of the above functions internally call the `PrepData` to preprocess the data and `Regressor` functions from Gloss to run the actual regression itself.
+
+## Normalization of LIPSTIC Signal using Gloss
+
+Gloss can also be used to separately normalize LIPSTIC signal, by regressing out the RNA library size and sample hashtag library size confounders at a dataset level. This is done by using Gloss to regress LIPSTIC signal only on the confounders, with no genes - this reduces to Lasso regression. 
+
+When `PrepData` is called, this is run by default, and the resulting normalized LIPSTIC expression is stored under the `gloss_normalized_biotin` observation field of the AnnData:
+
+```{python}
+datapath = 'myscrna_anndata.h5ad' # with raw values in anndata.X
+
+from Gloss.prepdata import PrepData
+
+prepped_data = PrepData(datapath,
+                  'hallmark',
+                  'raw sample hashtag library size',
+                  'RNA library size',
+                  'uLIPSTIC raw signal')
+
+prepped_data.adata.obs['gloss_normalized_biotin'] # normalized biotin stored here
+```
+
