@@ -12,13 +12,14 @@ class PrepData():
     def __init__(self, adata, pathway_string, 
                  sample_hashtag = 'hash_max', libsize = 'n_counts',
                  interaction = 'biotin',
-                 donors_profiled = False, only_pathways=False):
+                 donors_profiled = False, only_pathways=False, ctype_norm_biotin=False):
         ## we need to have raw counts in the anndata.X, 
         ## and we need to have 'biotin_raw' as a field
         ## and we need to have 'sample hashtag' out
         self.norm = 'log_scaled'
         self.donors_profiled = donors_profiled
         self.only_pathways = only_pathways
+        self.ctype_norm_biotin = ctype_norm_biotin
         self.sample_hashtag = sample_hashtag
         self.libsize = libsize 
         self.interaction = interaction
@@ -126,3 +127,17 @@ class PrepData():
         my_biotin = self.adata.obs['new_biotin']
 
         self.adata.obs['gloss_normalized_biotin'] = my_biotin - (norm_reg.coef_[-2] * my_libsize + norm_reg.coef_[-1] * my_sample_hashtag)
+
+        if self.ctype_norm_biotin:
+            biotin_to_normalize = my_biotin.copy()
+            for ctype in self.adata.obs[self.ctype_norm_biotin].unique():
+                index = self.adata.obs[self.ctype_norm_biotin].isin([ctype])
+                ctype_features_matrix = features_matrix[index, :]
+                ctype_y = self.y[index]
+                ctype_norm_reg = NormalizeLipsticRegressor().normalize_fit(ctype_features_matrix, ctype_y)
+                
+                my_libsize.to_numpy()[index]
+
+                biotin_to_normalize[index] = my_biotin[index] - (ctype_norm_reg.coef_[-2] * my_libsize[index] + ctype_norm_reg.coef_[-1] * my_sample_hashtag[index])
+
+            self.adata.obs['gloss_ctype_normalized_biotin'] = biotin_to_normalize
