@@ -9,12 +9,15 @@ class PathwaysModule():
         self.adata_genes = adata_genes
         self.pathways = {}
         self.accepted_pathways = set(['hallmark', 'kegg'])
-        if pathway_string not in self.accepted_pathways:
-            raise ValueError('pathways string not in {}'.format(", ".join(self.accepted_pathways)))
-        elif pathway_string == 'hallmark':
-            self.pathways = self._get_hallmark_pathways()
-        elif pathway_string == 'kegg':
-            self.pathways = self._get_kegg_pathways()
+        if type(pathway_string) == str:
+            if pathway_string not in self.accepted_pathways:
+                raise ValueError('pathways string not in {}'.format(", ".join(self.accepted_pathways)))
+            elif pathway_string == 'hallmark':
+                self.pathways = self._get_hallmark_pathways()
+            elif pathway_string == 'kegg':
+                self.pathways = self._get_kegg_pathways()
+        elif type(pathway_string) == dict:
+            self.pathways = self._filter_pathways(pathway_string)
 
         self.pathway_genes = self._get_pathway_genes()
 
@@ -54,3 +57,8 @@ class PathwaysModule():
     
     def _get_pathway_genes(self):
         return set([ x for mylist in self.pathways.values() for x in mylist ])
+    
+    def _filter_pathways(self, pathway_gene_sets):
+        for key, value in pathway_gene_sets.items():
+            pathway_gene_sets[key] = list(set([gene for gene in value if gene in self.adata_genes]))
+        return self._non_empty_pathways(pathway_gene_sets)
