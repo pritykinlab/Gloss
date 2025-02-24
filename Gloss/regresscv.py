@@ -15,7 +15,7 @@ class RegressCV():
     def __init__(self, adata, resolutions, pathway_string,
                  sample_hashtag = 'hash_max', libsize = 'n_counts',
                  interaction = 'biotin',
-                 group_regs = [0.004, 0.005, 0.006, 0.007, 0.008], single_gene_regs = [1., 2., 3., 4., 5.], 
+                 group_regs = [0.004, 0.005, 0.006, 0.007, 0.008, 0.02], single_gene_regs = [1., 2., 3., 4., 5.], 
                  donors_profiled=False):
         self.pathway_string = pathway_string
         self.prepped_data = PrepData(adata, self.pathway_string, 
