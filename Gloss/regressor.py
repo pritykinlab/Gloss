@@ -9,7 +9,7 @@ from .pathwaysmodule import PathwaysModule
 
 class Regressor(BaseEstimator, RegressorMixin):
     # separate pathway database 
-    def __init__(self, gene_list, pathway_string, group_reg=0.005, single_gene_reg=3, only_pathways=False):
+    def __init__(self, gene_list, pathway_string, group_reg=0.005, single_gene_reg=3., only_pathways=False):
         super().__init__()
         self.group_reg = group_reg 
         self.single_gene_reg = single_gene_reg
@@ -79,7 +79,7 @@ class Regressor(BaseEstimator, RegressorMixin):
         # accounting for the two confounders
         for _ in range(2):
             partitions.append(list(np.arange(i, i+1)))
-            weights.append(1)
+            weights.append(1.)
             i += 1
 
         weights = np.array(weights)
