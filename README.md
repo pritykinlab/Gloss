@@ -2,7 +2,7 @@
 
 Gloss is a computational method that regresses LIPSTIC data on scRNA-seq features in paired LIPSTIC+scRNA-seq experiments. It accomplishes this by using an overlapping group lasso procedure using a set of pathways (which are preloaded into Gloss).
 
-![Gloss Diagram](Gloss_Figure1_github.png)
+![Gloss Diagram](Gloss_schematic.png)
 
 ## Installation
 
