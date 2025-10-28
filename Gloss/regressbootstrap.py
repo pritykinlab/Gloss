@@ -22,19 +22,22 @@ class RegressBootstrap():
                                      interaction,
                                      donors_profiled=donors_profiled)
     
-        self.response = self._bootstrap()
+        self.response, self.intercepts = self._bootstrap()
         self.response_individual_genes = self._bootstrap_res_individual_genes()
         self.pathway_frequencies = self._get_pathway_frequencies()
 
     def _bootstrap(self):
         bootstrap_response = {}
+        bootstrap_response_intercepts = {}
         for res in self.resolutions:
             bootstrap_response[res] = {}
+            bootstrap_response_intercepts[res] = {}
             for ctype in self.resolutions[res]:
                 X, y = self.prepped_data.subset(res, ctype)
 
                 # List to store bootstrap coefficients
                 bootstrap_coefficients = []
+                bootstrap_intercepts = []
 
                 # Bootstrapping
                 for i in range(self.n_bootstraps):
@@ -46,6 +49,7 @@ class RegressBootstrap():
                                       )
                     myreg.fit(X_resampled, y_resampled)
                     bootstrap_coefficients.append(myreg.coef_)
+                    bootstrap_intercepts.append(myreg.intercept_)
 
                 # Convert to DataFrame for analysis
                 bootstrap_coefficients = np.array(bootstrap_coefficients)
@@ -57,8 +61,9 @@ class RegressBootstrap():
                 sorted_columns = medians.sort_values().index
                 sorted_df = coefficients_df[sorted_columns]
                 bootstrap_response[res][ctype] = sorted_df
+                bootstrap_response_intercepts[res][ctype] = bootstrap_intercepts
 
-        return bootstrap_response 
+        return bootstrap_response, bootstrap_response_intercepts
 
     def _bootstrap_res_individual_genes(self):
         ind_genes_response = {}
